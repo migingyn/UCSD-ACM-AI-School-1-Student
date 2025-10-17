@@ -1,0 +1,13 @@
+# Ignore everything by default
+*
+
+# But do not ignore directories (needed for git to traverse them)
+!*/
+
+# But do not ignore these types of files
+!*.py
+!*.txt
+!*.md
+
+# Do not ignore the .gitignore file itself
+!.gitignore
