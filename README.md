@@ -4,7 +4,7 @@ Welcome to the ACM AI Workshop! This competition challenges you to build a robus
 
 ## 📁 Files Overview
 
-### For Students (You'll Use These):
+### You'll Use These:
 
 - **`main.py`** - Training script (train/val/test on CIFAR-10)
 - **`kaggle_submission.py`** - Generate Kaggle submission from trained model
@@ -410,3 +410,4 @@ python kaggle_submission.py
 ```
 
 Good luck, and may your gradients be ever in your favor! 🚀
+
