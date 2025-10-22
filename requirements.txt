@@ -11,7 +11,3 @@ seaborn
 tqdm
 ipywidgets
 notebook
-
-
-# enable GPU-capable PyTorch wheels (includes CUDA runtime)
---extra-index-url https://download.pytorch.org/whl/cu126
