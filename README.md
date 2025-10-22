@@ -2,6 +2,8 @@
 
 Welcome to the ACM AI Workshop on Computer Vision and Image Classification!
 
+Kaggle Link: https://www.kaggle.com/t/5822d84800d7461ea402e108d8d84e61
+
 ## 📚 Workshop Structure
 
 ### Part 1: Demo - CIFAR-10 (Instructor-led)
