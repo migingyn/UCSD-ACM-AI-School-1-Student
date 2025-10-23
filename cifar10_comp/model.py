@@ -1,5 +1,5 @@
 """
-CNN Models for CIFAR-100 Competition
+CNN Models for CIFAR-10 Competition
 
 This file contains model architectures for the competition.
 SimpleCNN is provided as a baseline - try improving it!
@@ -12,10 +12,10 @@ import torch.nn as nn
 
 class SimpleCNN(nn.Module):
     """
-    Simple CNN baseline for CIFAR-100
+    Simple CNN baseline for CIFAR-10
 
     This is a basic architecture to get you started.
-    Current architecture achieves ~40-50% accuracy.
+    Current architecture achieves ~50-60% accuracy.
 
     TODO: Improve this architecture! Some ideas:
     - Add more convolutional layers
@@ -25,7 +25,7 @@ class SimpleCNN(nn.Module):
     - Add residual connections (ResNet-style)
     - Try different activation functions
     """
-    def __init__(self, num_classes=100):
+    def __init__(self, num_classes=10):
         super(SimpleCNN, self).__init__()
 
         # Feature extraction layers
@@ -68,7 +68,7 @@ class SimpleCNN(nn.Module):
 # TODO: Try creating your own model architecture!
 # Example:
 # class ImprovedCNN(nn.Module):
-#     def __init__(self, num_classes=100):
+#     def __init__(self, num_classes=10):
 #         super(ImprovedCNN, self).__init__()
 #         # Your improved architecture here!
 #         pass

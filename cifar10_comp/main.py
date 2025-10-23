@@ -1,7 +1,7 @@
 """
-CIFAR-100 Competition - Training Script
+CIFAR-10 Competition - Training Script
 
-This script trains a CNN on CIFAR-100 and generates predictions for Kaggle submission.
+This script trains a CNN on CIFAR-10 and generates predictions for Kaggle submission.
 
 Usage:
     python main.py --epochs 20 --lr 0.001 --batch_size 128
@@ -18,7 +18,7 @@ Arguments:
     --model: Model to use (default: SimpleCNN)
 
 The script will:
-1. Load CIFAR-100 dataset
+1. Load CIFAR-10 dataset
 2. Train the model
 3. Save the best model as 'best_model.pth'
 4. Generate 'submission.csv' for Kaggle (if test.csv and test_images/ exist)
@@ -172,7 +172,8 @@ def generate_submission(model, test_csv='test.csv', test_images_dir='test_images
     with torch.no_grad():
         for img_id in tqdm(test_df['id'], desc='Predicting'):
             # Load image
-            img_path = os.path.join(test_images_dir, f'{img_id}.png')
+            img_filename = f'{str(img_id).zfill(5)}.png'
+            img_path = os.path.join(test_images_dir, img_filename)
             if not os.path.exists(img_path):
                 print(f'Warning: {img_path} not found, skipping...')
                 continue
@@ -204,7 +205,7 @@ def generate_submission(model, test_csv='test.csv', test_images_dir='test_images
 
 def main():
     # Parse command line arguments
-    parser = argparse.ArgumentParser(description='CIFAR-100 Competition Training')
+    parser = argparse.ArgumentParser(description='CIFAR-10 Competition Training')
     parser.add_argument('--epochs', type=int, default=10,
                        help='Number of training epochs (default: 10)')
     parser.add_argument('--lr', type=float, default=0.001,
@@ -237,11 +238,11 @@ def main():
     print(f'Model: {args.model}')
     print('='*60 + '\n')
 
-    # Load CIFAR-100 dataset
-    print('Loading CIFAR-100 dataset...')
-    train_dataset = datasets.CIFAR100(root='./data', train=True, download=True,
+    # Load CIFAR-10 dataset
+    print('Loading CIFAR-10 dataset...')
+    train_dataset = datasets.CIFAR10(root='./data', train=True, download=True,
                                      transform=get_transforms(augment=True))
-    test_dataset = datasets.CIFAR100(root='./data', train=False, download=True,
+    test_dataset = datasets.CIFAR10(root='./data', train=False, download=True,
                                     transform=get_transforms(augment=False))
 
     train_loader = DataLoader(train_dataset, batch_size=args.batch_size, shuffle=True, num_workers=2)
@@ -252,7 +253,7 @@ def main():
 
     # Create model
     # TODO: Support different models from model.py
-    model = SimpleCNN(num_classes=100).to(device)
+    model = SimpleCNN(num_classes=10).to(device)
     print(f'Model: {args.model}')
     print(f'Parameters: {sum(p.numel() for p in model.parameters()):,}\n')
 

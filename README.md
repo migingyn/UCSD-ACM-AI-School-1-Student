@@ -17,12 +17,12 @@ In this interactive demo, you'll learn:
 
 ---
 
-### Part 2: Competition - CIFAR-100 (Hands-on)
-**File:** `cifar100_comp.ipynb`
+### Part 2: Competition - CIFAR-10 Classification (Hands-on)
+**Folder:** `cifar10_comp/`
 
-Build a CNN to classify CIFAR-100 images (100 classes) and compete on Kaggle!
+Build a CNN to classify CIFAR-10 images (10 classes) and compete on Kaggle!
 
-**Goal:** Achieve the highest accuracy on the test set.
+**Goal:** Achieve the highest accuracy on the augmented test set.
 
 ---
 
@@ -30,6 +30,11 @@ Build a CNN to classify CIFAR-100 images (100 classes) and compete on Kaggle!
 
 ### 1. Install Dependencies
 
+```bash
+pip install -r requirements.txt
+```
+
+Or manually install:
 ```bash
 pip install torch torchvision pandas pillow tqdm matplotlib scikit-learn scikit-image
 ```
@@ -45,46 +50,112 @@ The instructor will guide you through completing the code!
 
 ### 3. Competition (Hands-on)
 
-Open the competition notebook:
+Navigate to the competition folder:
 ```bash
-jupyter notebook cifar100_comp.ipynb
+cd cifar10_comp
+```
+
+You have two options for working on the competition:
+
+#### Option A: Jupyter Notebook (Recommended for beginners)
+```bash
+jupyter notebook cifar10_comp.ipynb
 ```
 
 This notebook includes:
-- Data exploration
-- Starter CNN code
-- Training loop
-- Function to generate `submission.csv`
+- Data exploration and visualization
+- Starter CNN code to modify
+- Interactive training cells
+
+#### Option B: Python Scripts (For advanced users)
+```bash
+# Train your model
+python main.py --epochs 20
+
+# Generate submission from trained model
+python kaggle_submission.py
+```
 
 ---
 
 ## 📊 Competition Workflow
 
-### Step 1: Train Your Model
-
-Run `cifar100_comp.ipynb` to:
-- Explore the CIFAR-100 dataset
-- Build and train a CNN
-- Save the best model as `best_model.pth`
-
-### Step 2: Download Test Data from Kaggle
+### Step 1: Download Test Data from Kaggle
 
 Download these files from the Kaggle competition page:
 - `test.csv` - List of test image IDs
 - `test_images.zip` - Test images folder
 
-Unzip `test_images.zip` in the same directory as your notebook.
+Place both files in the `cifar10_comp/` folder, then unzip:
+```bash
+cd cifar10_comp
+unzip test_images.zip
+```
 
-### Step 3: Generate Predictions
+### Step 2: (Optional) Explore the Data
 
-Run the last cell in `cifar100_comp.ipynb` to:
-- Load your best model
-- Generate predictions for test images
-- Save `submission.csv`
+Open `cifar10_comp.ipynb` and run the data exploration cells to understand:
+- What CIFAR-10 classes look like
+- Class distribution
+- Image statistics
 
-### Step 4: Submit to Kaggle
+**Note:** This is helpful for understanding the data but not required for training.
 
-Upload `submission.csv` to Kaggle and check your score!
+### Step 3: Improve Your Model
+
+Modify `model.py` to improve the CNN architecture:
+- Add more convolutional layers
+- Add BatchNorm layers
+- Try different architectures
+- Experiment with dropout rates
+
+**Key Tips:**
+- The baseline `SimpleCNN` achieves ~50-60% accuracy
+- Adding BatchNorm and more layers can boost to 70%+
+
+### Step 4: Add Data Augmentation
+
+Modify the `get_transforms()` function in `main.py` to add augmentations:
+
+```python
+transforms.ColorJitter(brightness=0.3, contrast=0.3, saturation=0.3),
+transforms.RandomRotation(15),
+transforms.RandomAffine(degrees=0, translate=(0.1, 0.1)),
+transforms.RandomGrayscale(p=0.1),
+```
+
+**This is CRITICAL!** The test set has augmentations (noise, blur, color shifts).
+
+### Step 5: Train Your Model and Generate Submission
+
+Run the training script:
+```bash
+python main.py --epochs 20 --lr 0.001 --batch_size 128
+```
+
+This will:
+1. Train your model on CIFAR-10
+2. Save the best model as `best_model.pth`
+3. **Automatically generate predictions** on the test set
+4. Create `submission.csv` with your predictions
+
+**That's it!** The script does everything for you.
+
+### Step 6: Submit to Kaggle
+
+Upload `submission.csv` to Kaggle and check your score on the leaderboard!
+
+---
+
+### Alternative: Manual Submission Generation
+
+If you need to regenerate predictions without retraining, you can use:
+
+```bash
+python kaggle_submission.py
+```
+
+**Note:** You'll need to modify `kaggle_submission.py` to use your model architecture if you changed it from the baseline `SimpleCNN`.
 
 ---
 
@@ -92,49 +163,58 @@ Upload `submission.csv` to Kaggle and check your score!
 
 ### 1. Data Augmentation is KEY! 🔑
 
-The test set has augmentations (noise, blur, color shifts, etc.).
+The test set has heavy augmentations (noise, blur, color shifts, rotations).
 
-**Add augmentations to your training data** in the `get_transforms()` function:
+**Add augmentations to your training data** to generalize better:
 ```python
 transforms.ColorJitter(brightness=0.3, contrast=0.3, saturation=0.3),
 transforms.RandomRotation(15),
 transforms.RandomAffine(degrees=0, translate=(0.1, 0.1)),
+transforms.RandomGrayscale(p=0.1),
+transforms.GaussianBlur(kernel_size=3)
 ```
+
+**Impact:** Can improve score by 10-15%!
 
 ### 2. Improve the Model Architecture
 
-The baseline CNN is simple. Try:
-- Adding more convolutional layers
-- Using BatchNorm after Conv layers
-- Experimenting with different filter sizes
-- Adding residual connections
+The baseline `SimpleCNN` is simple. Try:
+- Adding more convolutional blocks (4-6 blocks total)
+- Using BatchNorm after Conv layers: `nn.BatchNorm2d(channels)`
+- Trying deeper networks (more filters: 256, 512)
+- Adding residual connections (ResNet-style)
+
+**Impact:** Can improve score by 5-10%
 
 ### 3. Train Longer
 
-The default is 10 epochs. Try training for 20-50 epochs!
+The default is 10 epochs. Try training for 20-30 epochs!
+- Monitor validation accuracy to avoid overfitting
+- Use early stopping if accuracy plateaus
+
+**Impact:** Can improve score by 2-5%
 
 ### 4. Experiment with Hyperparameters
 
-- Learning rate
-- Batch size
-- Optimizer (Adam vs SGD vs AdamW)
-- Dropout rate
+Try different values:
+- **Learning rate:** 0.0001, 0.001, 0.01
+- **Batch size:** 64, 128, 256
+- **Optimizer:** Adam, SGD with momentum, AdamW
+- **Dropout rate:** 0.3, 0.5, 0.7
 
----
+**Impact:** Can improve score by 1-3%
 
-## 🐛 Troubleshooting
+### 5. Monitor Overfitting
 
-### "test.csv not found"
-Download `test.csv` from Kaggle and place it in the same directory as the notebook.
+Watch for signs of overfitting:
+- Training accuracy >> Test accuracy
+- Test accuracy stops improving
 
-### "test_images/ not found"
-Download and unzip `test_images.zip` from Kaggle.
-
-### "CUDA out of memory"
-Reduce batch size in the notebook (try 64 or 32 instead of 128).
-
-### Low Kaggle score despite good training accuracy?
-You're overfitting to clean images! Add more data augmentation.
+**Solutions:**
+- Add more data augmentation
+- Increase dropout
+- Use weight decay (AdamW optimizer)
+- Train for fewer epochs
 
 ---
 
@@ -142,40 +222,92 @@ You're overfitting to clean images! Add more data augmentation.
 
 ```
 workshop/
-├── cifar10_demo_student.ipynb    # Demo notebook (follow along)
-├── cifar100_comp.ipynb            # Competition notebook (hands-on)
-├── best_model.pth                 # Your trained model (generated)
-├── submission.csv                 # Your predictions (generated)
-├── test.csv                       # Test image IDs (download from Kaggle)
-└── test_images/                   # Test images (download from Kaggle)
-    ├── 00000.png
-    ├── 00001.png
-    └── ...
+├── README.md                      # This file
+├── requirements.txt               # Python dependencies
+├── cifar10_demo_student.ipynb     # Demo notebook (follow along)
+│
+└── cifar10_comp/                  # Competition folder
+    ├── cifar10_comp.ipynb         # Competition notebook (interactive)
+    ├── model.py                   # CNN architecture (modify this!)
+    ├── main.py                    # Training script (modify this!)
+    ├── kaggle_submission.py       # Generate submission
+    │
+    ├── best_model.pth             # Trained model (generated after training)
+    ├── submission.csv             # Predictions (generated before submission)
+    │
+    ├── test.csv                   # Test IDs (download from Kaggle)
+    └── test_images/               # Test images (download from Kaggle)
+        ├── 00000.png
+        ├── 00001.png
+        └── ...
 ```
 
 ---
 
 ## 🏆 Submission Format
 
-Your `submission.csv` must have:
+Your `submission.csv` must have this format:
 ```csv
 id,label
-00000,42
-00001,17
-00002,89
+0,3
+1,8
+2,5
 ...
 ```
 
 - **id:** Image ID (from test.csv)
-- **label:** Predicted class (0-99)
+- **label:** Predicted class (0-9 for CIFAR-10)
+
+The submission generation scripts handle this automatically!
+
+---
+
+## 🐛 Troubleshooting
+
+### "test.csv not found"
+Download `test.csv` from Kaggle and place it in the `cifar10_comp/` folder.
+
+### "test_images/ not found"
+Download and unzip `test_images.zip` from Kaggle into the `cifar10_comp/` folder.
+
+### "CUDA out of memory"
+Reduce batch size:
+- In notebook: Change `BATCH_SIZE = 64` (or 32)
+- In script: `python main.py --batch_size 64`
+
+### Low Kaggle score despite good training accuracy?
+You're overfitting to clean images! **Add more data augmentation.**
+
+### ImportError: No module named 'torch'
+Install dependencies: `pip install -r requirements.txt`
+
+### Model not improving after a few epochs?
+- Try a different learning rate
+- Add data augmentation
+- Make sure BatchNorm is added to your model
+- Train longer (20-30 epochs)
+
+---
+
+## 🎯 Expected Performance
+
+| Configuration | Validation Acc | Expected Kaggle Score |
+|--------------|----------------|----------------------|
+| Baseline (SimpleCNN, no aug) | ~55% | ~50-55% |
+| Baseline + augmentation | ~65% | ~60-65% |
+| Improved model + augmentation | ~70-75% | ~68-73% |
+| Advanced techniques | ~75-80% | ~73-78% |
+
+*Note: Kaggle test scores are typically 2-5% lower than validation due to augmentations*
 
 ---
 
 ## 📚 Resources
 
 - **PyTorch Tutorials:** https://pytorch.org/tutorials/
-- **CIFAR-100 Dataset:** https://www.cs.toronto.edu/~kriz/cifar.html
+- **CIFAR-10 Dataset:** https://www.cs.toronto.edu/~kriz/cifar.html
 - **Data Augmentation:** https://pytorch.org/vision/stable/transforms.html
+- **CNN Architectures:** https://pytorch.org/vision/stable/models.html
 
 ---
 
@@ -184,9 +316,23 @@ id,label
 - Ask questions during the workshop!
 - Check the Kaggle competition discussion forum
 - Review the demo notebook for examples
+- Look at `model.py` and `main.py` for code structure
+
+---
+
+## 🎓 Learning Objectives
+
+By the end of this workshop, you should be able to:
+
+✅ Understand how CNNs work for image classification
+✅ Build and train a CNN using PyTorch
+✅ Apply data augmentation to improve robustness
+✅ Tune hyperparameters for better performance
+✅ Generate predictions and submit to Kaggle
+✅ Debug common issues in model training
 
 ---
 
 Good luck and have fun! 🚀
 
-**Remember:** The key to winning is data augmentation + good architecture!
+**Remember:** The key to winning is **data augmentation** + **good architecture** + **proper training**!
