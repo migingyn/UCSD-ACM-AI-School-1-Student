@@ -37,7 +37,7 @@ import os
 
 # Import the model
 from model import SimpleCNN
-
+    
 
 def get_transforms(augment=False):
     """
@@ -66,7 +66,11 @@ def get_transforms(augment=False):
             transforms.RandomHorizontalFlip(),
             transforms.RandomCrop(32, padding=4),
             # TODO: Add more augmentations here!
-
+            transforms.ColorJitter(brightness=0.2, contrast=0.2, saturation=0.2),
+            transforms.RandomRotation(15),
+            transforms.RandomAffine(degrees=0, translate=(0.1, 0.1)),
+            transforms.RandomGrayscale(p=0.1),
+            transforms.GaussianBlur(kernel_size=3, sigma=(0.1, 2.0)),
             transforms.ToTensor(),
             transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))
         ])
@@ -212,9 +216,9 @@ def main():
                        help='Learning rate (default: 0.001)')
     parser.add_argument('--batch_size', type=int, default=128,
                        help='Batch size for training (default: 128)')
-    parser.add_argument('--optimizer', type=str, default='adam',
+    parser.add_argument('--optimizer', type=str, default='adamw',
                        choices=['adam', 'sgd', 'adamw'],
-                       help='Optimizer: adam, sgd, or adamw (default: adam)')
+                       help='Optimizer: adam, sgd, or adamw (default: adamw)')
     parser.add_argument('--scheduler', action='store_true',
                        help='Use learning rate scheduler (default: False)')
     parser.add_argument('--model', type=str, default='SimpleCNN',
